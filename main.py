@@ -2,7 +2,8 @@ import spotipy
 import spotipy.util as util
 from pymongo import MongoClient
 from profileinfo import username, client_id, client_secret, cluster
-    
+import time    
+
 # database setup
 client = MongoClient(cluster)
 db = client.spotify
@@ -17,31 +18,35 @@ token = util.prompt_for_user_token(
     redirect_uri='http://localhost/'
 )
 
-sp = spotipy.Spotify(auth=token)
-recently_played = sp.current_user_recently_played(limit=50)['items']
+# sets starting point
+most_recent = {'name': 'Palette', 'artist': '常闇トワ', 'duration': 215705, 'played_at': '2022-01-23T22:27:54.965Z'}
 
-most_recent = {'name':[],'artist':[],'duration':[],'played_at':[]}
+while True: 
+    sp = spotipy.Spotify(auth=token)
+    recently_played = sp.current_user_recently_played(limit=50)['items']
 
-for song in recently_played:
-    my_dict = {'name':[],'artist':[],'duration':[],'played_at':[]}
-    my_dict['name'] = (song['track']['name'])
-    my_dict['artist'] = (song['track']['artists'][0]['name'])
-    my_dict['duration'] = (song['track']['duration_ms'])
-    my_dict['played_at'] = (song['played_at'])
+    for song in recently_played:
+        my_dict = {'name':[],'artist':[],'duration':[],'played_at':[]}
+        my_dict['name'] = (song['track']['name'])
+        my_dict['artist'] = (song['track']['artists'][0]['name'])
+        my_dict['duration'] = (song['track']['duration_ms'])
+        my_dict['played_at'] = (song['played_at'])
 
-    # check if updated
-    if my_dict == most_recent:
-        print('caught up!')
-        break
-    
-    result = stats.insert_one(my_dict)
-    print(f'Inserted: {my_dict}')
+        # check if updated
+        if my_dict == most_recent:
+            print('caught up!')
+            break
+        
+        result = stats.insert_one(my_dict)
+        print(f'Inserted: {my_dict}')
 
-most_recent = {
-    'name':recently_played[0]['track']['name'],
-    'artist':recently_played[0]['track']['artists'][0]['name'],
-    'duration':recently_played[0]['track']['duration_ms'],
-    'played_at':recently_played[0]['played_at']
-    }
+    # set new most_recent
+    most_recent = {
+        'name':recently_played[0]['track']['name'],
+        'artist':recently_played[0]['track']['artists'][0]['name'],
+        'duration':recently_played[0]['track']['duration_ms'],
+        'played_at':recently_played[0]['played_at']
+        }
 
-print(f'most recent: {most_recent}')
+    print(f'most recent: {most_recent}')
+    time.sleep(7200)
