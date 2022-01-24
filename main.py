@@ -19,7 +19,7 @@ token = util.prompt_for_user_token(
 )
 
 # sets starting point
-most_recent = {'name': 'Palette', 'artist': '常闇トワ', 'duration': 215705, 'played_at': '2022-01-23T22:27:54.965Z'}
+most_recent = {'name': 'Dark seeks light', 'artist': 'ニノミヤユイ', 'duration': 214426, 'played_at': '2022-01-24T16:11:20.801Z'}
 
 while True: 
     sp = spotipy.Spotify(auth=token)
